@@ -1,64 +1,50 @@
-const inputBox = document.querySelector('.input-box');
-const searchBtn = document.getElementById('searchBtn');
-const weather_img = document.querySelector('.weather-img');
-const temperature = document.querySelector('.temperature');
-const description = document.querySelector('.description');
-const humidity = document.getElementById ('humidity');
-const wind_speed = document.getElementById('wind-speed');
 
-const location_not_found = document.querySelector('.location-not-found');
+const btn = document.getElementById("submit");
+const temp = document.getElementById("input-1");
+const tempSelect = document.getElementById("select-1");
+const resultSpan = document.querySelector(".result");
 
-const weather_body = document.querySelector('.weather-body');
+btn.addEventListener("click", (e)=>{
+    e.preventDefault();
+    convert();
+});
 
+temp.addEventListener("input", convert);
+tempSelect.addEventListener("change", convert);
 
-async function checkWeather(city){
-    const api_key ="d3f1b52ba31a0df2760a55cb9181e33f";
-    const url = 'https://api.openweathermap.org/data/2.5/weather?id=${city}&appid=${api_key}';
+function convert()
+{
+    let result = 0.0;
+    temp.value = temp.value.trim();
+    let suffix = "";
 
-    const weather_data = await fetch('${url}').then(response => response.json());
+    const tempType = tempSelect.options[tempSelect.selectedIndex];
 
+    if(tempType.value == "cel")
+    {
+        result = celToFah(temp.value);
+        suffix = "&deg; F";
 
-    if(weather_data.cod === '404'){
-        location_not_found.style.display = "flex";
-        weather_body.style.display =  "none";
-        console.log("error");
-        return;
+    }else if(tempType.value == "fah")
+    {
+        result = fahToCel(temp.value);
+        suffix = "&deg; C";
     }
 
-    console.log("run");
-    location_not_found.style.display = "none";
-    weather_body.style.display = "flex";
-    temperature.innerHTML = '${Math.round(weather_data.main.temp - 273.15)}°C';
-    description.innerHTML = '${weather_data.weather[0].description}';
-
-    humidity.innerHTML = '${weather_data.main.humidity}%';
-    wind_speed.innerHTML = '${weather_data.wind.speed}Km/H';
-
-
-    switch(weather_data.weather[0].main){
-        case 'Clouds':
-            weather_img.src = "unnamed.png";
-            break;
-        case 'Clear':
-            weather_img.src = "WhatsApp Image 2024-02-18 at 11.54.04_b6105a62.jpg";
-            break;
-        case 'Rain':
-            weather_img.src = "WhatsApp Image 2024-02-18 at 11.54.05_2ac22c97.jpg";
-            break;   
-        case 'Mist':
-            weather_img.src = "WhatsApp Image 2024-02-18 at 11.54.05_05a6ae44.jpg";
-            break;
-        case 'Snow':
-            weather_img.src = "WhatsApp Image 2024-02-18 at 11.54.06_5e7c9802.jpg";
-            break; 
-        
+    if(result)
+    {
+        resultSpan.innerHTML = result.toFixed(1) + suffix;
+        console.log(result);
     }
-
-
-    console.log(weather_data);
 }
 
+function celToFah(value) {
+    return (value * 9/5) + 32;
+}
 
-searchBtn.addEventListener('click', ()=>{
-    checkWeather(inputBox.value);
-});
+function fahToCel(value) {
+    return 5/9*(value - 32);
+}
+
+convert();
+
